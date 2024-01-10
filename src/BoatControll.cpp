@@ -79,39 +79,35 @@ float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_headin
     Serial.print("Optimal heading: ");
     Serial.println(optimal_heading_angle);
 
-    // Calculate error
+    // Calculate signed error
     float error = optimal_heading_angle - boat_heading_angle;
-
-    // Normalize error between 0 and 1
+    // Normalize error to be between -1 and 1
     error = error / 180;
+    // normalize between 0 and 1
+    error = error / 2 + 0.5;
 
-    int kp = 1;
-    // Calculate output
-    float output = kp * error;
-
-    return output;
+    return error;
 }
 
-void servo_control(float position, Servo rudder_servo)
+float servo_control(float position)
 {
     // write to servo
-    Serial.print("Servo Position: ");
-    Serial.println(position);
-
+    Serial.print("Servo Position ms: ");
+    Serial.println(1000 + position * 1000);
     // Rudder servo is a linear servo, so the position is between 0 and 1
-    rudder_servo.writeMicroseconds(1000 + position * 1000);
+    return (1000 + position * 1000);
 }
 
-void sailflap_control(float wind_direction_deg, Servo sailflap_servo)
+float sailflap_control(float wind_direction_deg)
 {
     if (wind_direction_deg > 180)
     {
-        sailflap_servo.writeMicroseconds(1000);
+        return (1000);
         Serial.println("Sailflap right");
     }
     else
     {
-        sailflap_servo.writeMicroseconds(2000);
+        return (2000);
         Serial.println("Sailflap left");
     }
 }

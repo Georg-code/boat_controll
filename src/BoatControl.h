@@ -17,8 +17,8 @@ struct Vector2D
 float normalize(float vector[ARRAY_SIZE]);
 float *calculate_new_heading(float boat_vector[ARRAY_SIZE], float wind_direction_vector[ARRAY_SIZE], float goal_vector[ARRAY_SIZE], float new_heading[ARRAY_SIZE]);
 float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_heading_vec[ARRAY_SIZE]);
-void servo_control(float position, Servo rudder_servo);
-void sailflap_control(float wind_direction_deg, Servo sailflap_servo);
+float servo_control(float position);
+float sailflap_control(float wind_direction_deg);
 Vector2D azimuthToVector(double azimuth);
 
 #endif // BOAT_CONTROL_H

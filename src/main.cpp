@@ -23,8 +23,9 @@ void setup()
 {
   Serial.begin(9600); // Initialize serial communication
 
-  rudder_servo.attach(6);
-  sailflap_servo.attach(13);
+  rudder_servo.attach(19);
+  sailflap_servo.attach(5);
+  rudder_servo.writeMicroseconds(1500);
 }
 
 void loop()
@@ -42,10 +43,10 @@ void loop()
       // convert compass_azimuth to a vector
       Vector2D boat_vec = azimuthToVector(compass_azimuth);
 
-      float wind_direction_vec[ARRAY_SIZE] = {0.0, 0.0};
-      float wind_direction_deg = 0.0;
+      float wind_direction_vec[ARRAY_SIZE] = {0.0, 0.0}; // TODO
+      float wind_direction_deg = 0.0;                    // TODO
       float boat_heading_vec[ARRAY_SIZE] = {boat_vec.x, boat_vec.y};
-      float goalcords_vec[ARRAY_SIZE] = {1.0, 1.0};
+      float goalcords_vec[ARRAY_SIZE] = {1.0, 1.0}; // TODO
 
       float goal_vector[ARRAY_SIZE];
       for (int i = 0; i < ARRAY_SIZE; i++)
@@ -56,8 +57,8 @@ void loop()
       float optimal_heading_vec[ARRAY_SIZE];
       calculate_new_heading(boat_heading_vec, wind_direction_vec, goal_vector, optimal_heading_vec);
       float output = rudder_controller(boat_heading_vec, optimal_heading_vec);
-      servo_control(output, rudder_servo);
-      sailflap_control(wind_direction_deg, sailflap_servo);
+      rudder_servo.writeMicroseconds(servo_control(output));
+      sailflap_servo.writeMicroseconds(sailflap_control(wind_direction_deg));
       delay(1000);
     }
   }
