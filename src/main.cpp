@@ -5,7 +5,9 @@
 #include <cmath>
 #include "BoatControl.h"
 #include "JsonHandler.h"
+#include <QMC5883LCompass.h>
 
+QMC5883LCompass compass;
 Servo rudder_servo;
 Servo sailflap_servo;
 
@@ -26,6 +28,10 @@ void setup()
   rudder_servo.attach(19);
   sailflap_servo.attach(5);
   rudder_servo.writeMicroseconds(1500);
+  
+  Wire.begin();
+
+  compass.init();
 }
 
 void loop()
@@ -37,11 +43,13 @@ void loop()
     String jsonString = Serial.readStringUntil('\n');
     int gps_lat, gps_lng, wind_direction_raw, compass_azimuth;
 
-    if (JsonHandler::parseJson(jsonString, gps_lat, gps_lng, wind_direction_raw, compass_azimuth))
+    if (JsonHandler::parseJson(jsonString, gps_lat, gps_lng, wind_direction_raw))
     {
       float boatcords_vec[ARRAY_SIZE] = {gps_lat, gps_lng};
       // convert compass_azimuth to a vector
-      Vector2D boat_vec = azimuthToVector(compass_azimuth);
+      Vector2D boat_vec = azimuthToVector(compass.getAzimuth());
+      Serial.print("Azimuth: ");
+      Serial.println(compass.getAzimuth());
 
       float wind_direction_vec[ARRAY_SIZE] = {0.0, 0.0}; // TODO
       float wind_direction_deg = 0.0;                    // TODO

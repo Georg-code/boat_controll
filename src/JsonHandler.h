@@ -5,7 +5,7 @@
 
 class JsonHandler {
 public:
-    static bool parseJson(String jsonString, int &gps_lat, int &gps_lng, int &wind_direction_raw, int &compass_azimuth);
+    static bool parseJson(String jsonString, int &gps_lat, int &gps_lng, int &wind_direction_raw);
 };
 
 #endif // JSON_HANDLER_H

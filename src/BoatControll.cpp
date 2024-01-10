@@ -94,8 +94,17 @@ float servo_control(float position)
     // write to servo
     Serial.print("Servo Position ms: ");
     Serial.println(1000 + position * 1000);
+    float rudder_pos = 1000 + position * 1000;
+    if (rudder_pos < 1000)
+    {
+        rudder_pos = 1000;
+    }
+    else if (rudder_pos > 2000)
+    {
+        rudder_pos = 2000;
+    }
     // Rudder servo is a linear servo, so the position is between 0 and 1
-    return (1000 + position * 1000);
+    return (rudder_pos);
 }
 
 float sailflap_control(float wind_direction_deg)
