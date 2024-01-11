@@ -7,10 +7,12 @@
 #include <QMC5883LCompass.h>
 #include <Wire.h>
 #include <AS5040.h>
+#include <TinyGPSPlus.h>
 
 QMC5883LCompass compass;
 Servo rudder_servo;
 Servo sailflap_servo;
+TinyGPSPlus gps;
 
 unsigned long lastTime;
 double Input, Output, Setpoint;
@@ -52,13 +54,13 @@ void setup()
 
   Wire.begin();
   Serial.begin(9600);
+  Serial2.begin(9600);
 
   rudder_servo.attach(19);
   sailflap_servo.attach(5);
   rudder_servo.writeMicroseconds(1500);
 
   compass.init();
-  compass.setSmoothing(10, true);
 
   pinMode(BEEPER_PIN, OUTPUT);
   beep(3);
@@ -70,14 +72,35 @@ void loop()
 
 {
 
-  Serial.print(enc.read(), DEC);
+  while (Serial2.available() > 0)
+
+    if (millis() > 5000 && gps.charsProcessed() < 10)
+    {
+      Serial.println(F("No GPS detected: check wiring."));
+      while (true)
+        ;
+    }
 
   compass.read();
+
+  Serial.print("Winddir: ");
+  Serial.println(enc.read() * 0.3515625);
+
+  Serial2.print("Winddir: ");
+  Serial2.println(enc.read() * 0.3515625);
+
+  Serial.print("Azimuth: ");
+  Serial.println(compass.getAzimuth());
+
   float wind_direction_raw = enc.read();
   int gps_lat, gps_lng, compass_azimuth;
 
-  float boatcords_vec[ARRAY_SIZE] = {gps_lat, gps_lng};
-  Vector2D boat_vec = azimuthToVector(compass.getAzimuth() + 180);
+  float boatcords_vec[ARRAY_SIZE] = {gps.location.lat(), gps.location.lng()};
+  Serial.print("Boatcords: ");
+  Serial.print(boatcords_vec[0]);
+  Serial.print(", ");
+  Serial.println(boatcords_vec[1]);
+  Vector2D boat_vec = azimuthToVector(fmod((90 - compass.getAzimuth()), 360));
 
   float wind_direction_vec[ARRAY_SIZE] = {cos(wind_direction_raw * 0.3515625), sin(wind_direction_raw * 0.3515625)};
 
