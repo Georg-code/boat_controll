@@ -1,4 +1,6 @@
 // BoatControl.cpp
+
+
 #include "BoatControl.h"
 
 float normalize(float vector[ARRAY_SIZE])
@@ -73,14 +75,12 @@ float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_headin
     float boat_heading_angle = atan2(boat_heading_vec[1], boat_heading_vec[0]) * 180 / M_PI;
     float optimal_heading_angle = atan2(optimal_heading_vec[1], optimal_heading_vec[0]) * 180 / M_PI;
 
-    
-
     // Calculate signed error
     float error = optimal_heading_angle - boat_heading_angle;
     // Normalize error to be between -1 and 1
-    error = error / 180;
+    error = (error * 2) / (180);
     // normalize between 0 and 1
-    error = error / 2 + 0.5;
+    error = error / 4 + 0.5;
 
     return error;
 }
@@ -88,7 +88,7 @@ float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_headin
 float servo_control(float position)
 {
     // write to servo
-    
+
     float rudder_pos = 1000 + position * 1000;
     if (rudder_pos < 1000)
     {
