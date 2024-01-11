@@ -10,8 +10,8 @@
 
 struct Vector2D
 {
-    double x;
-    double y;
+    float x;
+    float y;
 };
 
 float normalize(float vector[ARRAY_SIZE]);

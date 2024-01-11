@@ -73,11 +73,7 @@ float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_headin
     float boat_heading_angle = atan2(boat_heading_vec[1], boat_heading_vec[0]) * 180 / M_PI;
     float optimal_heading_angle = atan2(optimal_heading_vec[1], optimal_heading_vec[0]) * 180 / M_PI;
 
-    Serial.print("Boat heading: ");
-    Serial.println(boat_heading_angle);
-
-    Serial.print("Optimal heading: ");
-    Serial.println(optimal_heading_angle);
+    
 
     // Calculate signed error
     float error = optimal_heading_angle - boat_heading_angle;
@@ -92,8 +88,7 @@ float rudder_controller(float boat_heading_vec[ARRAY_SIZE], float optimal_headin
 float servo_control(float position)
 {
     // write to servo
-    Serial.print("Servo Position ms: ");
-    Serial.println(1000 + position * 1000);
+    
     float rudder_pos = 1000 + position * 1000;
     if (rudder_pos < 1000)
     {

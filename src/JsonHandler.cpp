@@ -1,6 +1,6 @@
 #include "JsonHandler.h"
 
-bool JsonHandler::parseJson(String jsonString, int &gps_lat, int &gps_lng, int &wind_direction_raw)
+bool JsonHandler::parseJson(String jsonString, float &gps_lat, float &gps_lng, int wind_direction_raw)
 {
     DynamicJsonDocument doc(1024);
     DeserializationError error = deserializeJson(doc, jsonString);
@@ -14,7 +14,7 @@ bool JsonHandler::parseJson(String jsonString, int &gps_lat, int &gps_lng, int &
     {
         gps_lat = doc["gps_lat"];
         gps_lng = doc["gps_lng"];
-        wind_direction_raw = doc["wind_direction_raw"];
+        wind_direction_raw = doc["wind_rotation_raw"];
         return true;
     }
 }
