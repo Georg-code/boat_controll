@@ -83,15 +83,6 @@ void loop()
 
   compass.read();
 
-  Serial.print("Winddir: ");
-  Serial.println(enc.read() * 0.3515625);
-
-  Serial2.print("Winddir: ");
-  Serial2.println(enc.read() * 0.3515625);
-
-  Serial.print("Azimuth: ");
-  Serial.println(compass.getAzimuth());
-
   float wind_direction_raw = enc.read();
   int gps_lat, gps_lng, compass_azimuth;
 
@@ -100,6 +91,7 @@ void loop()
   Serial.print(boatcords_vec[0]);
   Serial.print(", ");
   Serial.println(boatcords_vec[1]);
+
   Vector2D boat_vec = azimuthToVector(fmod((90 - compass.getAzimuth()), 360));
 
   float wind_direction_vec[ARRAY_SIZE] = {cos(wind_direction_raw * 0.3515625), sin(wind_direction_raw * 0.3515625)};
