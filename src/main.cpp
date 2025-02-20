@@ -9,6 +9,14 @@
 #include <AS5040.h>
 #include <TinyGPSPlus.h>
 
+// Include the rudder and sailflap controllers
+
+
+
+
+
+
+
 QMC5883LCompass compass;
 Servo rudder_servo;
 Servo sailflap_servo;
@@ -52,7 +60,7 @@ void beep(int times)
 void setup()
 {
 
-  Wire.begin();
+  /*Wire.begin();
   Serial.begin(9600);
   Serial2.begin(9600);
 
@@ -65,13 +73,14 @@ void setup()
   pinMode(BEEPER_PIN, OUTPUT);
   beep(3);
   if (!enc.begin())
-    Serial.println("Error setting up AS5040");
+    Serial.println("Error setting up AS5040");*/
 }
 
 void loop()
 
 {
 
+  /*
   while (Serial2.available() > 0)
 
     if (millis() > 5000 && gps.charsProcessed() < 10)
@@ -119,5 +128,5 @@ void loop()
     rudder_servo.writeMicroseconds(rudder_pos_storage);
   }
 
-  sailflap_servo.writeMicroseconds(sailflap_control(wind_direction_deg));
+  sailflap_servo.writeMicroseconds(sailflap_control(wind_direction_deg));*/
 }

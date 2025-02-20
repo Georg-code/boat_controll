@@ -1,0 +1,26 @@
+//
+// Created by georg on 08.02.2025.
+//
+
+
+#include <vector>
+
+#include "AS5600.h"
+#ifndef WINDSENSE_H
+#define WINDSENSE_H
+
+AS5600L as5600;
+
+class Windsense {
+
+public:
+    static void setup();
+
+    static int getAngle();
+
+    static int getAvgAngle();
+};
+
+
+
+#endif //WINDSENSE_H
