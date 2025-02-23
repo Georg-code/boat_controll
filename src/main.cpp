@@ -8,6 +8,8 @@
 #include <Wire.h>
 #include <AS5040.h>
 #include <TinyGPSPlus.h>
+#include <Navigation/Navigation.h>
+
 
 // Include the rudder and sailflap controllers
 
@@ -59,6 +61,7 @@ void beep(int times)
 
 void setup()
 {
+  Position pos;
 
   /*Wire.begin();
   Serial.begin(9600);
