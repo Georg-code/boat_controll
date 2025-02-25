@@ -3,3 +3,10 @@
 //
 
 #include "Rudder.h"
+
+#include <Navigation/Navigation.h>
+
+
+void Rudder::setRudderPos() {
+    Navigation::calculateRudder()
+}

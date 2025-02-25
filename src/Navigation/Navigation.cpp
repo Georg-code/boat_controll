@@ -1,11 +1,11 @@
-//
-// Created by georg on 20.02.2025.
-//
-
 #include "Navigation.h"
+#include "../Util/BoatLog.h"
 
 
-double Navigation::getRudderPos(double currentHeading, double desiredHeading) const {
+double Navigation::calculateRudder(const double desiredHeading) const {
+    currentHeading =
+
+
     double error = desiredHeading - currentHeading;
     if (error > 180) {
         error -= 360;
@@ -14,26 +14,34 @@ double Navigation::getRudderPos(double currentHeading, double desiredHeading) co
     }
 
     // Compute time difference
-    unsigned long now = Position::getTime();
-    double deltaTime = (now - lastTime) / 1000.0; // Convert to seconds
-    lastTime = Position::getTime();
+    unsigned long now = millis();
+    double deltaTime = (now - lastTime) / 1000.0;
+
+
+    // Falls deltaTime negativ oder 0 ist (z. B. beim ersten Durchlauf)
+    if (deltaTime <= 0) {
+        deltaTime = 0.001; // Vermeidung von Division durch 0
+    }
 
     // Integral term (accumulate error over time)
     integral += error * deltaTime;
 
     // Derivative term (rate of change of error)
-    double derivative = (deltaTime > 0) ? (error - prevError) / deltaTime : 0;
+    double derivative = (error - prevError) / deltaTime;
 
     // PID output
     double output = Kp * error + Ki * integral + Kd * derivative;
 
-    // Store previous error
+    // Store previous values
     prevError = error;
+    lastTime = now;
 
-    // Constrain output (e.g., rudder range -45 to +45 degrees)
     output = constrain(output, 1, 2);
 
+    BoatLog::info("Hello");
+
     return output; // Return rudder angle command
-
-
 }
+
+
+// Set goal

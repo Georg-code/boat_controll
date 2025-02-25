@@ -8,7 +8,7 @@
 //
 #include <Arduino.h>
 #include <PID_v1.h>
-#include <Peripherals/GPS/Position.h>
+#include <Peripherals/Position/Position.h>
 
 
 class Navigation {
@@ -20,6 +20,7 @@ class Navigation {
   static unsigned long lastTime;
   static double prevError;
   static double integral;
+  static double currentHeading;
 
 
 
@@ -47,9 +48,9 @@ class Navigation {
 
     }
 
-    double getRudderPos(double currentHeading, double desiredHeading) const;
 
 
+  double calculateRudder(double desiredHeading) const;
 };
 
 

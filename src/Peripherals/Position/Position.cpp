@@ -1,14 +1,18 @@
 #include "Position.h"
-
+#include "Adafruit_ICM20948.h"
 // Singleton function - return reference instead of value
 Position& Position::getInstance() {
     static Position instance;
     return instance;
 }
 
+
 // Constructor initializes software serial
 Position::Position() : gpsSerial(rxPin, txPin) {
     gpsSerial.begin(baudRate);
+    if (!icm.begin_I2C()) {
+        Serial.println("Failed to find ICM20948 chip");
+    }
 }
 
 // Start the GPS module
@@ -22,6 +26,7 @@ void Position::update() {
         gps.encode(static_cast<char>(gpsSerial.read()));
     }
 }
+
 
 // Check if GPS data is valid
 bool Position::isValid() const {
@@ -49,30 +54,13 @@ double Position::getKnots() {
 }
 
 // Get Heading (course over ground in degrees)
-double Position::getHeading() {
-    return gps.course.isValid() ? gps.course.deg() : 0.0;
+double Position::getHeading() { // fill in with azimuth and respect of the function.
+    return 10.0;
 }
 
 // Get number of satellites
 unsigned long Position::getSatellites() {
     return gps.satellites.isValid() ? gps.satellites.value() : 0;
-}
-
-// Get current time
-long Position::getTime() {
-    if (gps.date.isValid() && gps.time.isValid()) {
-        tm t{};
-        t.tm_year = gps.date.year() - 1900;  // Years since 1900
-        t.tm_mon = gps.date.month() - 1;    // Months are 0-11
-        t.tm_mday = gps.date.day();
-        t.tm_hour = gps.time.hour();
-        t.tm_min = gps.time.minute();
-        t.tm_sec = gps.time.second();
-        t.tm_isdst = 0; // No daylight saving time
-
-        return mktime(&t);  // Convert to Unix timestamp
-    }
-    return 0;
 }
 
 // Print GPS data to Serial Monitor
@@ -92,3 +80,4 @@ void Position::displayData() {
         Serial.println("Waiting for GPS signal...");
     }
 }
+

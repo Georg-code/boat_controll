@@ -9,6 +9,7 @@
 #include <AS5040.h>
 #include <TinyGPSPlus.h>
 #include <Navigation/Navigation.h>
+#include <Util/BoatLog.h>
 
 
 // Include the rudder and sailflap controllers
@@ -61,7 +62,12 @@ void beep(int times)
 
 void setup()
 {
-  Position pos;
+
+  // Debugging output
+  BoatLog::EnableDebug = true;
+  BoatLog::EnableError = true;
+  BoatLog::EnableInfo = true;
+  BoatLog::EnableNavigation = true;
 
   /*Wire.begin();
   Serial.begin(9600);

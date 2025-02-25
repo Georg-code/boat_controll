@@ -4,6 +4,7 @@
 #include <TinyGPSPlus.h>
 #include <SoftwareSerial.h>
 #include <ctime>
+#include "Adafruit_ICM20948.h"
 
 class Position {
     int rxPin = 34;
@@ -24,16 +25,20 @@ public:
     double getHeading();
     unsigned long getSatellites();
     void displayData();
-    long getTime();
+
+    double computeAzimuth();
+
+    Position(const Position&) = delete;
+    Position& operator=(const Position&) = delete;
 
 private:
     Position(); // Private constructor
     TinyGPSPlus gps;
     SoftwareSerial gpsSerial;
+    Adafruit_ICM20948 icm;
 
-    // Delete copy constructor and assignment operator
-    Position(const Position&) = delete;
-    Position& operator=(const Position&) = delete;
+
+
 };
 
 #endif
