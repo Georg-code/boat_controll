@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 #include <ctime>
 #include "Adafruit_ICM20948.h"
+#include <ArduinoEigen.h>
 
 class Position {
     int rxPin = 34;
@@ -16,17 +17,18 @@ public:
     static Position& getInstance();
 
     void begin();
+    void setup();
     void update();
     bool isValid() const;
     double getLatitude();
     double getLongitude();
     double getSpeed();
     double getKnots();
-    double getHeading();
+    Eigen::Vector2d getHeading();
     unsigned long getSatellites();
     void displayData();
 
-    double computeAzimuth();
+
 
     Position(const Position&) = delete;
     Position& operator=(const Position&) = delete;

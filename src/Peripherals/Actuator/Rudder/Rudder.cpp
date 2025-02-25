@@ -3,10 +3,15 @@
 //
 
 #include "Rudder.h"
+#include <Arduino.h>
 
 #include <Navigation/Navigation.h>
 
 
 void Rudder::setRudderPos() {
-    Navigation::calculateRudder()
+  
+
+
+
+   Navigation::calculateNextHeading(0, 0 , Navigation::getGoal());
 }

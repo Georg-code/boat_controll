@@ -9,7 +9,7 @@
 
 class Rudder : public Actuator {
     public:
-       void setRudderPos();
+       static static void setRudderPos();
 
 };
 

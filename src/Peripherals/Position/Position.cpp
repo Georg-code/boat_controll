@@ -1,11 +1,11 @@
 #include "Position.h"
 #include "Adafruit_ICM20948.h"
+#include <ArduinoEigen.h>
 // Singleton function - return reference instead of value
 Position& Position::getInstance() {
     static Position instance;
     return instance;
 }
-
 
 // Constructor initializes software serial
 Position::Position() : gpsSerial(rxPin, txPin) {
@@ -18,6 +18,14 @@ Position::Position() : gpsSerial(rxPin, txPin) {
 // Start the GPS module
 void Position::begin() {
     gpsSerial.begin(baudRate);
+    // ICM initialization
+    if (!icm.begin_I2C()) {
+        Serial.println("Failed to find ICM20948 chip");
+    }
+    icm.setGyroRateDivisor(19);
+    icm.setAccelRateDivisor(19);
+
+
 }
 
 // Read and parse GPS data
@@ -54,8 +62,17 @@ double Position::getKnots() {
 }
 
 // Get Heading (course over ground in degrees)
-double Position::getHeading() { // fill in with azimuth and respect of the function.
-    return 10.0;
+Eigen::Vector2d Position::getHeading() {
+    // get ICM magnetometer data
+    sensors_event_t accel;
+    sensors_event_t gyro;
+    sensors_event_t mag;
+    sensors_event_t temp;
+    icm.getEvent(&accel, &gyro, &temp, &mag);
+    // create 2D vector from magnetometer data
+    Eigen::Vector2d heading;
+    heading << mag.magnetic.x, mag.magnetic.y;
+    return heading;
 }
 
 // Get number of satellites
@@ -73,7 +90,7 @@ void Position::displayData() {
         Serial.print(" | Speed: ");
         Serial.print(getSpeed());
         Serial.print(" m/s | Heading: ");
-        Serial.print(getHeading());
+
         Serial.print("° | Satellites: ");
         Serial.println(getSatellites());
     } else {

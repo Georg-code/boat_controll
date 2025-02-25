@@ -7,21 +7,28 @@
 // PID
 //
 #include <Arduino.h>
-#include <PID_v1.h>
+
 #include <Peripherals/Position/Position.h>
+
+#include <Preferences.h>
+
+
+#include <ArduinoEigen.h>
+
+using namespace Eigen;
+
 
 
 class Navigation {
 
-  static double longitude;
-  static double latitude;
-  static double heading;
-  static double goal;
+  static Eigen::Vector2d position;
+  static Eigen::Vector2d heading;
+  static Eigen::Vector2d goal;
   static unsigned long lastTime;
   static double prevError;
   static double integral;
   static double currentHeading;
-
+  static double rudder_position;
 
 
     double Kp = 1.0;
@@ -31,27 +38,56 @@ class Navigation {
 
   public:
 
-    Navigation(double longitude, double latitude, double heading, double goal) {
-        Navigation::longitude = longitude;
-        Navigation::latitude = latitude;
-        Navigation::heading = heading;
-        Navigation::goal = goal;
+    explicit Navigation(double longitude = 0, double latitude = 0, double heading = 0, double goal = 0) {
 
     }
 
 
-    void setGoal() {
+    static void navigation_step();
+
+
+    static void setGoal(const Vector2d &goal) {
+
+      Preferences preferences;
+      preferences.putString("goal", String(goal.x()) + "," + String(goal.y()));
+      Navigation::goal = goal;
 
     }
 
-    void getGoal() {
+  static void initGoal() {
+
+      Preferences preferences;
+
+      if (preferences.getString("goal") != nullptr) {
+
+          const String goal = preferences.getString("goal");
+
+          const int comma = goal.indexOf(',');
+
+          const double longitude = goal.substring(0, comma).toDouble();
+
+          const double latitude = goal.substring(comma + 1).toDouble();
+
+          Navigation::goal = Vector2d(longitude, latitude);
+      } else {
+        setGoal(Vector2d(0, 0));
+      }
 
     }
 
 
+    static Vector2d getGoal() {
+        return goal;
+    }
 
-  double calculateRudder(double desiredHeading) const;
+
+  double calculateRudder(Vector2d desired_heading) const;
+
+  static Vector2d calculateNextHeading(Vector2d current, Vector2d goal, Vector2d winddir);
+
 };
+
+
 
 
 
