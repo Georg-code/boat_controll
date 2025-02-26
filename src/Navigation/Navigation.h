@@ -21,9 +21,9 @@ using namespace Eigen;
 
 class Navigation {
 
-  static Eigen::Vector2d position;
-  static Eigen::Vector2d heading;
-  static Eigen::Vector2d goal;
+  static Vector2d position;
+  static Vector2d heading;
+  static Vector2d goal;
   static unsigned long lastTime;
   static double prevError;
   static double integral;
@@ -31,9 +31,7 @@ class Navigation {
   static double rudder_position;
 
 
-    double Kp = 1.0;
-    double Ki = 0.0;
-    double Kd = 0.0;
+
 
 
   public:
@@ -81,7 +79,7 @@ class Navigation {
     }
 
 
-  double calculateRudder(Vector2d desired_heading) const;
+  static double calculateRudder(Vector2d desired_heading) const;
 
   static Vector2d calculateNextHeading(Vector2d current, Vector2d goal, Vector2d winddir);
 

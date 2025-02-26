@@ -4,6 +4,7 @@
 
 
 #include <vector>
+#include <ArduinoEigen.h>
 
 #include "AS5600.h"
 #ifndef WINDSENSE_H
@@ -19,6 +20,9 @@ public:
     static int getAngle();
 
     static int getAvgAngle();
+
+    static Eigen::Vector2d getWindDirection();
+
 };
 
 

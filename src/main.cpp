@@ -11,7 +11,10 @@ void setup() {
     BoatLog::info("Position Node Initialized");
     Navigation::initGoal();
     BoatLog::navigation("Goal was set to: ", Navigation::getGoal().x(), ", ", Navigation::getGoal().y());
+}
 
 void loop() {
+    Navigation::navigation_step();
 
+    delay(100);
 }

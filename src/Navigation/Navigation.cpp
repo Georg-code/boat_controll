@@ -2,6 +2,8 @@
 #include "../Util/BoatLog.h"
 
 #include <ArduinoEigen.h>
+#include <Peripherals/Windsense/Windsense.h>
+
 #include "cmath"
 #include "string"
 
@@ -9,6 +11,10 @@ using namespace Eigen;
 
 // Calculate the rudder angle based on the current heading and the desired heading
 double Navigation::calculateRudder(Vector2d desired_heading) const {
+
+    const double Kp = 1.0;
+    const double Ki = 0.0;
+    double Kd = 0.0;
 
 // convert desired heading to degrees
     const double desired_heading_deg = atan2(desired_heading.y(), desired_heading.x()) * 180 / M_PI;
@@ -85,16 +91,21 @@ static Vector2d calculateNextHeading(const Vector2d& current, const Vector2d& go
 
 
 void Navigation::navigation_step() {
+
+    // navigation data
     const Vector2d goal = getGoal();
-    const Vector2d winddir = Vector2d(0, 0); // TODO: get wind direction
-    const Vector2d currentHeading = Vector2d(0, 0); // TODO: get current heading
+    const Vector2d winddir = Windsense::getWindDirection();
+    const Vector2d currentHeading = Position::getInstance().getHeading();
+
+    // TODO: rotate wind vector relative to boat
+    Vector2d heading = calculateNextHeading(currentHeading, goal, winddir);
+
+    // TODO set the rudder
+
+    double rudderpos = calculateRudder(heading);
+
+    // TODO sailwinf logic
 
 
-    calculateNextHeading(currentHeading, goal, winddir);
-
-    /* Set rudder
-     * Set Sail flap
-     * Check for stability
-     */
 }
 
