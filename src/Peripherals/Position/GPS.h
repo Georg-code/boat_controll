@@ -23,6 +23,14 @@ public:
     int getMonth();
     int getDay();
 
+    int getKnots();
+
+    int getCourse();
+
+    int getAltitude();
+
+    int getSatellites();
+
 private:
     GPS();                          // Private constructor
     GPS(const GPS&) = delete;       // Prevent copy

@@ -25,6 +25,9 @@ void setup() {
         while (true);
     }
 
+    // setup Windsense
+    Windsense::getInstance()->setup();
+
 
 /* TODO TUESDAY
  * Get the GPS data from the Position class
@@ -52,20 +55,41 @@ void setup() {
 void loop() {
     digitalWrite(32, LOW);
     IMU& imu = IMU::getInstance();
+    GPS& gps = GPS::getInstance();
+    Windsense& wind = *Windsense::getInstance();
     imu.update();
 
-    // average of 100 samples of azimuth from IMU
+    // LED on if BLE is connected
+    if (ble.isConnected()) {
+        digitalWrite(32, HIGH);
+    } else {
+        digitalWrite(32, LOW);
+    }
+
 
     static float angle = 0;
     ble.setBatteryLevel(95);
-    ble.setLocationAndSpeed(51.5074, -0.1278, 15, 1030, 9000);
-    ble.setNavigation(8900, 8700, 12345);
-    ble.setWind(1230, 4560, 1500);
-    ble.setAccelerometer(0.01, 0.00, 9.81);
-    ble.setGyroscope(0.1, 0.2, 0.3);
-    ble.setMagnetometer(angle, 48.5, 1.2);
+
+    if (gps.isLocationValid()) {
+        ble.setGPSReady(false);
+        ble.setLocationAndSpeed(gps.getLatitude(), gps.getLongitude(), gps.getAltitude(), gps.getKnots(), gps.getCourse(), gps.getSatellites(), 0);
+    } else {
+        ble.setGPSReady(true);
+        ble.setLocationAndSpeed(0, 0, 0, 0, 0,69, 0);
+    }
+
+    ble.setNavigation(8900, gps.getCourse(), 12345);
+    ble.setWind(-1, wind.getAngle(), -1);
+    ble.setAccelerometer(imu.getAccelX(), imu.getAccelY(), imu.getAccelZ());
+    ble.setGyroscope(imu.getGyroX(), imu.getGyroY(), imu.getGyroZ());
+    ble.setMagnetometer(imu.getMagX(), gps.getSatellites(), -1);
     angle += 1;
     ble.loop();
+
+    // Satelites
+    Serial.print("Satellites: ");
+    Serial.println(gps.getSatellites());
+
 
 
 

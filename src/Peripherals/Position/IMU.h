@@ -26,6 +26,8 @@ public:
     float getMagY() const;
     float getMagZ() const;
 
+    float getTemperature() const;
+
     float getAzimuth(int samples = 100);
 
 private:

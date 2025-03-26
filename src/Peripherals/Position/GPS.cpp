@@ -63,3 +63,20 @@ int GPS::getMonth() {
 int GPS::getDay() {
     return gps.date.day();
 }
+
+
+
+int GPS::getKnots() {
+    return gps.speed.knots();
+}
+int GPS::getCourse() {
+    return gps.course.deg();
+}
+
+int GPS::getAltitude() {
+    return gps.altitude.meters();
+}
+
+int GPS::getSatellites() {
+    return gps.satellites.value();
+}

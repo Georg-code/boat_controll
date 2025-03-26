@@ -1,25 +1,34 @@
 #include "BLEManager.h"
 
-class BLEManager::ServerCallbacks : public NimBLEServerCallbacks {
-    void onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) override {
-        Serial.printf("Client connected: %s\n", connInfo.getAddress().toString().c_str());
-    }
+// =================== Server Callback Implementation ===================
 
-    void onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) override {
-        Serial.println("Client disconnected. Restarting advertising...");
-        NimBLEDevice::startAdvertising();
-    }
-};
+void BLEManager::ServerCallbacks::onConnect(NimBLEServer* pServer) {
+    Serial.println("Client connected. vuee");
+}
+
+void BLEManager::ServerCallbacks::onDisconnect(NimBLEServer* pServer) {
+    Serial.println("Client disconnected. Restarting advertising... :(");
+
+    NimBLEDevice::startAdvertising();
+}
+
+
+
+// ======================== Constructor ========================
 
 BLEManager::BLEManager() {
     serverCallbacks = new ServerCallbacks();
 }
+
+// ======================== Initialization ========================
 
 void BLEManager::init() {
     NimBLEDevice::init("SailingDrone");
     NimBLEDevice::setSecurityAuth(BLE_SM_PAIR_AUTHREQ_SC);
     pServer = NimBLEDevice::createServer();
     pServer->setCallbacks(serverCallbacks);
+
+    pServer->advertiseOnDisconnect(true);
 
     /** Battery Service **/
     NimBLEService* battService = pServer->createService("180F");
@@ -39,6 +48,7 @@ void BLEManager::init() {
     NimBLEService* locNav = pServer->createService("1819");
     locationSpeedChar = locNav->createCharacteristic("2A67", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
     navigationChar    = locNav->createCharacteristic("2A68", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
+    satChar           = locNav->createCharacteristic("2A69", NIMBLE_PROPERTY::READ | NIMBLE_PROPERTY::NOTIFY);
     locNav->start();
 
     /** Environmental Sensing **/
@@ -71,14 +81,21 @@ void BLEManager::init() {
     adv->start();
 
     Serial.println("BLE Advertising Started");
+
 }
+
+// ========================== Loop ==========================
 
 void BLEManager::loop() {
-    delay(2000);
+    delay(500);
 }
 
+// =================== Notification Helper ===================
+
 void BLEManager::notifyIfConnected(NimBLECharacteristic* chr) {
-    if (pServer->getConnectedCount()) chr->notify();
+    if (pServer->getConnectedCount()) {
+        chr->notify();
+    }
 }
 
 // ========================== Setters ==========================
@@ -88,15 +105,17 @@ void BLEManager::setBatteryLevel(uint8_t percent) {
     notifyIfConnected(batteryLevelChar);
 }
 
-void BLEManager::setLocationAndSpeed(float lat, float lon, int16_t alt, uint16_t speed, uint16_t course) {
+void BLEManager::setLocationAndSpeed(float lat, float lon, int16_t alt, uint16_t speed, uint16_t course, uint8_t satellites) {
     uint8_t buf[14];
     writeFloatToBuf(buf, 0, lat);
     writeFloatToBuf(buf, 4, lon);
     memcpy(buf + 8, &alt, 2);
-    memcpy(buf +10, &speed, 2);
-    memcpy(buf +12, &course, 2);
+    memcpy(buf + 10, &speed, 2);
+    memcpy(buf + 12, &course, 2);
     locationSpeedChar->setValue(buf, 14);
     notifyIfConnected(locationSpeedChar);
+    satChar->setValue(&satellites, 1);
+    notifyIfConnected(satChar);
 }
 
 void BLEManager::setNavigation(uint16_t bearing, uint16_t heading, uint32_t distance) {
@@ -109,9 +128,12 @@ void BLEManager::setNavigation(uint16_t bearing, uint16_t heading, uint32_t dist
 }
 
 void BLEManager::setWind(uint16_t speed, uint16_t direction, uint16_t gust) {
-    windSpeedChar->setValue((uint8_t*)&speed, 2);    notifyIfConnected(windSpeedChar);
-    windDirChar->setValue((uint8_t*)&direction, 2);  notifyIfConnected(windDirChar);
-    gustChar->setValue((uint8_t*)&gust, 2);          notifyIfConnected(gustChar);
+    windSpeedChar->setValue(reinterpret_cast<uint8_t *>(&speed), 2);
+    notifyIfConnected(windSpeedChar);
+    windDirChar->setValue(reinterpret_cast<uint8_t *>(&direction), 2);
+    notifyIfConnected(windDirChar);
+    gustChar->setValue(reinterpret_cast<uint8_t *>(&gust), 2);
+    notifyIfConnected(gustChar);
 }
 
 void BLEManager::setAccelerometer(float x, float y, float z) {
@@ -146,3 +168,10 @@ void BLEManager::setMagnetometer(float heading, float fieldStrength, float decli
 void BLEManager::writeFloatToBuf(uint8_t* buf, int offset, float value) {
     memcpy(buf + offset, &value, sizeof(float));
 }
+
+bool BLEManager::isConnected() const {
+    return pServer->getConnectedCount();
+}
+
+
+

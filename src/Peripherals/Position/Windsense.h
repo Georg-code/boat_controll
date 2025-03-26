@@ -1,30 +1,17 @@
-//
-// Created by georg on 08.02.2025.
-//
-
-
-#include <vector>
-#include <ArduinoEigen.h>
-
-#include "AS5600.h"
 #ifndef WINDSENSE_H
 #define WINDSENSE_H
 
-
-
 class Windsense {
-
 public:
-    static void setup();
+    static Windsense* getInstance();  // Singleton access method
 
-    static int getAngle();
+    void setup();
+    int getAngle();
+    int getAvgAngle();
 
-    static int getAvgAngle();
-
-    static Eigen::Vector2d getWindDirection();
-
+private:
+    Windsense() = default;  // Private constructor
+    static Windsense* instance;
 };
 
-
-
-#endif //WINDSENSE_H
+#endif  // WINDSENSE_H
