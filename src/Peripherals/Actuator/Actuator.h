@@ -1,7 +1,7 @@
 //
 // Created by georg on 13.02.2025.
 //
-
+/*
 #ifndef ACTUATOR_H
 #define ACTUATOR_H
 
@@ -11,6 +11,9 @@ class Actuator {
     int current_position;
     int max_position;
     int min_position;
+
+    int sail_pin;
+    int rudder_pin;
 
     public:
     Actuator(int max_position, int min_position) {

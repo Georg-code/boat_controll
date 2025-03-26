@@ -20,6 +20,7 @@ public:
     static void info(Args&&... args) {
         if (!EnableInfo) return;
         log("[INFO] ", std::forward<Args>(args)...);
+
     }
 
     template<typename... Args>

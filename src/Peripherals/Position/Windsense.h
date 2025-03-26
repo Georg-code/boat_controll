@@ -10,7 +10,7 @@
 #ifndef WINDSENSE_H
 #define WINDSENSE_H
 
-AS5600L as5600;
+
 
 class Windsense {
 

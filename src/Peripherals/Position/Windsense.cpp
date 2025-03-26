@@ -4,8 +4,10 @@
 
 #include "Windsense.h"
 
-#include <ArduinoEigen.h>
+#include <AS5600.h>
+#include <HardwareSerial.h>
 
+AS5600 as5600;
 
 void Windsense::setup() {
 
@@ -46,6 +48,3 @@ int Windsense::getAvgAngle() {
 }
 
 
-Eigen::Vector2d Windsense::getWindDirection() {
-    return Eigen::Vector2d(cos(getAvgAngle()), sin(getAvgAngle()));
-}

@@ -1,11 +1,13 @@
 #include "Navigation.h"
 #include "../Util/BoatLog.h"
-
+/*
 #include <ArduinoEigen.h>
 #include <Peripherals/Windsense/Windsense.h>
 
 #include "cmath"
 #include "string"
+
+
 
 using namespace Eigen;
 
@@ -102,10 +104,11 @@ void Navigation::navigation_step() {
 
     // TODO set the rudder
 
-    double rudderpos = calculateRudder(heading);
+
 
     // TODO sailwinf logic
 
 
 }
 
+*/

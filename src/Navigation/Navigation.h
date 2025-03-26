@@ -2,13 +2,14 @@
 // Created by georg on 20.02.2025.
 //
 
+/*
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 // PID
 //
 #include <Arduino.h>
 
-#include <Peripherals/Position/Position.h>
+#include <Peripherals/Position/GPS.h>
 
 #include <Preferences.h>
 
@@ -79,7 +80,7 @@ class Navigation {
     }
 
 
-  static double calculateRudder(Vector2d desired_heading) const;
+  static double calculateRudder(Vector2d desired_heading);
 
   static Vector2d calculateNextHeading(Vector2d current, Vector2d goal, Vector2d winddir);
 
@@ -90,3 +91,4 @@ class Navigation {
 
 
 #endif //NAVIGATION_H
+*/
