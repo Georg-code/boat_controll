@@ -87,7 +87,7 @@ void BLEManager::init() {
 // ========================== Loop ==========================
 
 void BLEManager::loop() {
-    delay(500);
+    delay(200);
 }
 
 // =================== Notification Helper ===================
@@ -106,16 +106,15 @@ void BLEManager::setBatteryLevel(uint8_t percent) {
 }
 
 void BLEManager::setLocationAndSpeed(float lat, float lon, int16_t alt, uint16_t speed, uint16_t course, uint8_t satellites) {
-    uint8_t buf[14];
+    uint8_t buf[15]; // Was 14
     writeFloatToBuf(buf, 0, lat);
     writeFloatToBuf(buf, 4, lon);
     memcpy(buf + 8, &alt, 2);
     memcpy(buf + 10, &speed, 2);
     memcpy(buf + 12, &course, 2);
-    locationSpeedChar->setValue(buf, 14);
+    buf[14] = satellites; // <- Add satellite count here
+    locationSpeedChar->setValue(buf, 15); // Was 14
     notifyIfConnected(locationSpeedChar);
-    satChar->setValue(&satellites, 1);
-    notifyIfConnected(satChar);
 }
 
 void BLEManager::setNavigation(uint16_t bearing, uint16_t heading, uint32_t distance) {

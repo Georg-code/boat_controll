@@ -1,27 +1,31 @@
 #include "Navigation.h"
 #include "../Util/BoatLog.h"
-/*
+
 #include <ArduinoEigen.h>
-#include <Peripherals/Windsense/Windsense.h>
+#include <Peripherals/Actuator/Actuator.h>
+#include <Peripherals/Position/IMU.h>
+#include <Peripherals/Position/Windsense.h>
 
 #include "cmath"
 #include "string"
 
 
 
+
+
 using namespace Eigen;
 
-// Calculate the rudder angle based on the current heading and the desired heading
-double Navigation::calculateRudder(Vector2d desired_heading) const {
+
+double Navigation::calculateRudder(Vector2d desired_heading) {
 
     const double Kp = 1.0;
     const double Ki = 0.0;
     double Kd = 0.0;
 
 // convert desired heading to degrees
-    const double desired_heading_deg = atan2(desired_heading.y(), desired_heading.x()) * 180 / M_PI;
-
-    double error = desired_heading_deg - currentHeading;
+    const double desired_heading_deg = std::atan2(desired_heading.x(), desired_heading.y()) * 180 / M_PI;
+    const double current_heading_deg = std::atan2(headingVec.x(), headingVec.y()) * 180 / M_PI;
+    double error = desired_heading_deg - current_heading_deg;
     if (error > 180) {
         error -= 360;
     } else if (error < -180) {
@@ -59,56 +63,63 @@ double Navigation::calculateRudder(Vector2d desired_heading) const {
 }
 
 
-// Calculate the next heading based on the current position, goal and wind direction
-static Vector2d calculateNextHeading(const Vector2d& current, const Vector2d& goal, const Vector2d& winddir) {
-    constexpr double extra_rotation = 8;
-
-
-    Vector2d toGoal = (goal - current).normalized();
-    Vector2d toWind = (winddir - current).normalized();
-
-    // angle between toGoal and toWind
-    const double angle = atan2(toGoal.y(), toGoal.x()) - atan2(toWind.y(), toWind.x());
-    if (angle > M_PI / 4) {
-      return toGoal;
-    }
-
-    const Matrix2d transform_A = Eigen::Rotation2Dd(45 + extra_rotation).toRotationMatrix();
-    const Matrix2d transform_B = Eigen::Rotation2Dd(-(45 + extra_rotation)).toRotationMatrix();
-
-    Vector2d heading_A = transform_A * toWind;
-    Vector2d heading_B = transform_B * toWind;
-
-
-    // angle between Heading_A and toGoal
-    const double angle_A = atan2(heading_A.y(), heading_A.x()) - atan2(toGoal.y(), toGoal.x());
-    // angle between Heading_B and toGoal
-    const double angle_B = atan2(heading_B.y(), heading_B.x()) - atan2(toGoal.y(), toGoal.x());
-
-    if (angle_A < angle_B) {
-        return heading_A;
-    }
-    return heading_B;
+constexpr double deg2rad(double deg) {
+    return deg * M_PI / 180.0;
 }
+
 
 
 void Navigation::navigation_step() {
 
     // navigation data
     const Vector2d goal = getGoal();
-    const Vector2d winddir = Windsense::getWindDirection();
-    const Vector2d currentHeading = Position::getInstance().getHeading();
+    Navigation::goal = goal;
+    const double winddir = deg2rad(Windsense::getInstance()->getAngle());
+    const double currentHeading = deg2rad(IMU::getInstance().getAzimuth());
 
-    // TODO: rotate wind vector relative to boat
-    Vector2d heading = calculateNextHeading(currentHeading, goal, winddir);
+    Eigen::Rotation2Dd R(currentHeading);
 
-    // TODO set the rudder
+    double rudder_value = 0.5;
+
+    const Vector2d currentPos(GPSManager::getInstance().getLongitude(), GPSManager::getInstance().getLatitude());
+    position = currentPos;
+    const Vector2d nextOptimalHeading = calculateNextHeading(currentPos, goal, Vector2d(winddir, 0));
+
+    const Vector2d heading = Vector2d(std::sin(currentHeading), std::cos(currentHeading));
+    headingVec = heading;
+    const Vector2d currrentWind = R*Vector2d(std::sin(winddir), std::cos(winddir));
+
+    // check if the wind is coming from the front (+- 45°)
+    if (std::abs(heading.dot(currrentWind)) < 0.707) {
+        // find 2 possible headings and choose the one that is closer to the goal
+        Vector2d option1 = R*Vector2d(std::sin(winddir + deg2rad(45)), std::cos(winddir + deg2rad(45)));
+        Vector2d option2 = R*Vector2d(std::sin(winddir - deg2rad(45)), std::cos(winddir - deg2rad(45)));
+
+        if ((goal - currentPos).dot(option1) > (goal - currentPos).dot(option2)) {
+            rudder_value = calculateRudder(option1);
+        } else {
+            rudder_value = calculateRudder(option2);
+        }
+    } else {
+        rudder_value = calculateRudder(nextOptimalHeading);
+    }
+
+    int flap_value = (std::abs(heading.dot(currrentWind)) < 0.707) ? 1 : 0;
+
+
+    Actuator::getInstance().setRudder(rudder_value);
+    Actuator::getInstance().setFlap(flap_value);
 
 
 
-    // TODO sailwinf logic
+
+
+
+
+
+
+
 
 
 }
 
-*/

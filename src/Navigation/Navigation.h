@@ -2,14 +2,15 @@
 // Created by georg on 20.02.2025.
 //
 
-/*
+
+
 #ifndef NAVIGATION_H
 #define NAVIGATION_H
 // PID
 //
 #include <Arduino.h>
 
-#include <Peripherals/Position/GPS.h>
+#include <Peripherals/Position/GPSManager.h>
 
 #include <Preferences.h>
 
@@ -23,12 +24,11 @@ using namespace Eigen;
 class Navigation {
 
   static Vector2d position;
-  static Vector2d heading;
+  static Vector2d headingVec;
   static Vector2d goal;
   static unsigned long lastTime;
   static double prevError;
   static double integral;
-  static double currentHeading;
   static double rudder_position;
 
 
@@ -40,6 +40,8 @@ class Navigation {
     explicit Navigation(double longitude = 0, double latitude = 0, double heading = 0, double goal = 0) {
 
     }
+
+    static double calculateRudder(Vector2d desired_heading);
 
 
     static void navigation_step();
@@ -80,7 +82,7 @@ class Navigation {
     }
 
 
-  static double calculateRudder(Vector2d desired_heading);
+
 
   static Vector2d calculateNextHeading(Vector2d current, Vector2d goal, Vector2d winddir);
 
@@ -91,4 +93,5 @@ class Navigation {
 
 
 #endif //NAVIGATION_H
-*/
+
+

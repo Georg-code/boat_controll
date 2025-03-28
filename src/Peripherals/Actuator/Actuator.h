@@ -1,42 +1,25 @@
-//
-// Created by georg on 13.02.2025.
-//
-/*
 #ifndef ACTUATOR_H
 #define ACTUATOR_H
 
-
+#include <ESP32Servo.h>
 
 class Actuator {
-    int current_position;
-    int max_position;
-    int min_position;
+public:
+    static Actuator& getInstance();
 
-    int sail_pin;
-    int rudder_pin;
+    void begin(int rudderPin, int flapPin);
+    void setRudder(float value); // 0.0 - 1.0
+    void setFlap(float value);   // 0.0 - 1.0
 
-    public:
-    Actuator(int max_position, int min_position) {
-        this->max_position = max_position;
-        this->min_position = min_position;
-        this->current_position = 0;
-    }
+private:
+    Actuator();
+    Actuator(const Actuator&) = delete;
+    Actuator& operator=(const Actuator&) = delete;
 
-    void set_position(int position) {
-        if (position > max_position) {
-            position = max_position;
-        }
-        if (position < min_position) {
-            position = min_position;
-        }
-        this->current_position = position;
-    }
+    Servo rudderServo;
+    Servo flapServo;
 
-    int get_position() {
-        return this->current_position;
-    }
+    int mapToPulseWidth(float value); // 1000–2000 µs
 };
 
-
-
-#endif //ACTUATOR_H
+#endif

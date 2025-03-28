@@ -21,13 +21,12 @@ public:
 
     // ==== Setters for BLE Characteristics ====
     void setBatteryLevel(uint8_t percent);
-    void setLocationAndSpeed(float lat, float lon, int16_t alt, uint16_t speed, uint16_t course, uint8_t satellites, bool gpsReady);
+    void setLocationAndSpeed(float lat, float lon, int16_t alt, uint16_t speed, uint16_t course, uint8_t satellites);
     void setNavigation(uint16_t bearing, uint16_t heading, uint32_t distance);
     void setWind(uint16_t speed, uint16_t direction, uint16_t gust);
     void setAccelerometer(float x, float y, float z);
     void setGyroscope(float x, float y, float z);
     void setMagnetometer(float heading, float fieldStrength, float declination);
-    void setGPSReady(bool ready);
     bool isConnected() const;
 
 private:
